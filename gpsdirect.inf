@@ -1,0 +1,90 @@
+;
+; gpsdirect.inf
+;
+
+[Version]
+Signature	= "$Windows NT$"
+Class		= Sensor
+ClassGuid	= {5175D334-C371-4806-B3BA-71FD53C9258D}
+Provider	= %MSFT%
+CatalogFile = gpsdirect.cat
+DriverVer=01/31/2015,6.1.7600.16385
+
+; =================== Manufacturer/Models sections =======================
+
+[Manufacturer]
+%MSFT%                      = Microsoft,NTAMD64
+
+[Microsoft.NTAMD64]
+%gpsdirect.DeviceDesc% = gpsdirect_Install,Sensors\gpsdirect
+
+; =================== gpsdirect ==================================
+
+[gpsdirect_Install.NT]
+CopyFiles       = UMDriverCopy
+AddProperty     = DriverPropertiesSection
+
+[gpsdirect_Install.NT.hw]
+
+
+[gpsdirect_Install.NT.Services]
+AddService      = WUDFRd,0x000001fa,WUDFRD_ServiceInstall
+
+[gpsdirect_Install.NT.CoInstallers]
+AddReg          = WUDF_CoInstallers_AddReg
+CopyFiles       = WUDF_CoInstallers_CopyFiles
+
+[gpsdirect_Install.NT.Wdf]
+UmdfService             = gpsdirect,UMDFgpsdirect_Install
+UmdfServiceOrder        = gpsdirect
+UmdfImpersonationLevel  = Impersonation
+
+; =================== UMDF Service Install section ===================
+
+[UMDFgpsdirect_Install]
+UmdfLibraryVersion      = 1.9.0
+ServiceBinary           = %12%\UMDF\gpsdirect.dll
+DriverCLSID             = {FD451E5E-75E3-4731-9D71-1535E6DE0FA6}
+
+[WUDFRD_ServiceInstall]
+DisplayName     = %WudfRdDisplayName%
+ServiceType     = 1
+StartType       = 3
+ErrorControl    = 1
+ServiceBinary   = %12%\WUDFRd.sys
+LoadOrderGroup  = Base
+
+[SourceDisksFiles]
+gpsdirect.dll  = 1
+WudfUpdate_01011.dll = 1
+
+[SourceDisksNames]
+1 = %MediaDescription%
+
+[WUDF_CoInstallers_CopyFiles]
+WudfUpdate_01011.dll
+
+[WUDF_CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"WUDFUpdate_01011.dll"
+
+[DestinationDirs]
+UMDriverCopy            = 12,UMDF
+CoInstallers_CopyFiles  = 11
+
+[UMDriverCopy]
+gpsdirect.dll
+
+; =================== Driver Property section ===================
+
+[DriverPropertiesSection]
+DeviceIcon,,,,"%SystemRoot%\system32\sensorscpl.dll,-1000"
+
+; =================== Generic ==================================
+
+[Strings]
+MSFT                        = "Michael Chourdakis"
+MediaDescription            = "gpsdirect Driver Installation Media"
+ClassName                   = "gpsdirect Driver"
+WudfRdDisplayName           = "Windows Driver Foundation - User-mode Driver Framework Reflector"
+gpsdirect.DeviceDesc   = "gpsdirect"
+
